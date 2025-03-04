@@ -46,25 +46,40 @@ def check_password_strength(password):
 
     return score, feedback
 
-# Streamlit UI
+# Streamlit UI Styling
+st.set_page_config(page_title="Password Strength Meter", page_icon="🔐")
+st.markdown("""
+    <style>
+        .password-input { font-size: 18px; padding: 8px; }
+        .strength-bar { height: 10px; border-radius: 5px; margin-top: 5px; }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🔐 Password Strength Meter")
+st.write("Enter a password to check its security level!")
 
-password = st.text_input("Enter your password:", type="password")
+password = st.text_input("Enter your password:", type="password", key="password_input", on_change=lambda: None)
 
-if st.button("Check Password Strength"):
-    if password:
-        score, feedback = check_password_strength(password)
-
-        # Strength Rating
-        if score == 4:
-            st.success("✅ Strong Password! Great job!")
-        elif score == 3:
-            st.warning("⚠️ Moderate Password - Consider adding more security features.")
-        else:
-            st.error("❌ Weak Password - Improve it using the suggestions below:")
-            for msg in feedback:
-                st.write(msg)
-            st.info(f"🔹 Try using this strong password: `{generate_strong_password()}`")
+if password:
+    score, feedback = check_password_strength(password)
+    
+    # Strength Rating Colors
+    colors = ["#FF4B4B", "#FF8000", "#FFD700", "#4CAF50"]
+    strength_labels = ["Very Weak", "Weak", "Moderate", "Strong"]
+    
+    st.markdown(f'<div class="strength-bar" style="width: {score * 25}%; background-color: {colors[score]};"></div>', unsafe_allow_html=True)
+    st.markdown(f"**{strength_labels[score]} Password**")
+    
+    if score == 3:
+        st.warning("⚠️ Moderate Password - Consider making it stronger.")
+    elif score < 3:
+        st.error("❌ Weak Password - Improve it using the suggestions below:")
+        for msg in feedback:
+            st.write(msg)
+        
+        strong_password = generate_strong_password()
+        st.info(f"🔹 Try using this strong password: `{strong_password}`")
     else:
-        st.warning("⚠️ Please enter a password!")
-
+        st.success("✅ Strong Password! Great job!")
+else:
+    st.warning("⚠️ Please enter a password!")
