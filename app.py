@@ -21,23 +21,25 @@ def check_password_strength(password):
         return 1, feedback
 
     # Length Check
-    if len(password) >= 8:
+    if len(password) >= 12:  # Increase strong password length threshold
+        score += 2
+    elif len(password) >= 8:
         score += 1
     else:
         feedback.append("❌ Password should be at least 8 characters long.")
-    
+
     # Upper & Lowercase Check
     if re.search(r"[A-Z]", password) and re.search(r"[a-z]", password):
         score += 1
     else:
         feedback.append("❌ Include both uppercase and lowercase letters.")
-    
+
     # Digit Check
     if re.search(r"\d", password):
         score += 1
     else:
         feedback.append("❌ Add at least one number (0-9).")
-    
+
     # Special Character Check
     if re.search(r"[!@#$%^&*]", password):
         score += 1
@@ -45,6 +47,7 @@ def check_password_strength(password):
         feedback.append("❌ Include at least one special character (!@#$%^&*).")
 
     return score, feedback
+
 
 # Streamlit UI Styling
 st.set_page_config(page_title="Password Strength Meter", page_icon="🔐")
