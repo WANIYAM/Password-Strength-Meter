@@ -63,23 +63,38 @@ password = st.text_input("Enter your password:", type="password", key="password_
 if password:
     score, feedback = check_password_strength(password)
     
-    # Strength Rating Colors
-    colors = ["#FF4B4B", "#FF8000", "#FFD700", "#4CAF50"]
-    strength_labels = ["Very Weak", "Weak", "Moderate", "Strong"]
-    
-    st.markdown(f'<div class="strength-bar" style="width: {score * 25}%; background-color: {colors[score]};"></div>', unsafe_allow_html=True)
-    st.markdown(f"**{strength_labels[score]} Password**")
-    
-    if score == 3:
-        st.warning("⚠️ Moderate Password - Consider making it stronger.")
-    elif score < 3:
+    # Mapping 5 scores into 3 categories
+    if score <= 2:
+        color = "#FF4B4B"  # Red for Weak
+        label = "Weak"
+    elif score <= 4:
+        color = "#FFD700"  # Yellow for Moderate
+        label = "Moderate"
+    else:
+        color = "#4CAF50"  # Green for Strong
+        label = "Strong"
+
+    # Adjust width dynamically from 20% to 100%
+    bar_width = (score / 5) * 100
+
+    st.markdown(f'''
+        <div class="strength-bar" style="width: {bar_width}%; background-color: {color};"></div>
+    ''', unsafe_allow_html=True)
+
+    st.markdown(f"**{label} Password**")
+
+    if score <= 2:
         st.error("❌ Weak Password - Improve it using the suggestions below:")
         for msg in feedback:
             st.write(msg)
         
         strong_password = generate_strong_password()
         st.info(f"🔹 Try using this strong password: `{strong_password}`")
+
+    elif score <= 4:
+        st.warning("⚠️ Moderate Password - Consider making it stronger.")
     else:
         st.success("✅ Strong Password! Great job!")
+
 else:
     st.warning("⚠️ Please enter a password!")
